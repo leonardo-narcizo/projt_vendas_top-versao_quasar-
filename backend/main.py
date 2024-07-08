@@ -1,0 +1,46 @@
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from flask_socketio import SocketIO, emit
+from datetime import datetime
+from services.users import Usuario
+from db.db_config import conectar_db
+from api.charts_route import *
+from api.proposals_route import *
+from api.user_routes import *
+from api.car_routes import *
+from api.socket_routes import *
+
+#### API config
+app = Flask(__name__)
+CORS(app)
+app.json.sort_keys = False
+
+### Config do socketIO
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+
+
+
+### Importação rotas http
+criar_rotas_graficos(app)
+proposals_route(app)
+user_routes(app)
+car_routes(app)
+
+### Importação rotas socket
+
+socket_routes(socketio)
+
+@socketio.on('connect')
+def handle_connect():
+    print('Conexão com o SocketIO detectada!')
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Conexão sockeIO encerrada!')
+
+
+
+if __name__ == '__main__':
+    socketio.run(app, debug=True)
+
