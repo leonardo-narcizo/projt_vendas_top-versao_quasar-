@@ -1,6 +1,6 @@
-backend/api/__pycache__/
-backend/db/__pycache__/
-backend/services/__pycache__/
-backend/api/__pycache__/
+api/__pycache__/
+db/__pycache__/
+services/__pycache__/
+api/__pycache__/
 
-backend/googleCloudCredentials.json
+googleCloudCredentials.json
