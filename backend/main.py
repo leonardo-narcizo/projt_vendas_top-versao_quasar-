@@ -1,9 +1,13 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import os
 from flask_socketio import SocketIO, emit
 from datetime import datetime
 from services.users import Usuario
 from db.db_config import conectar_db
+
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'backend/googleCloudCredentials.json'
+
 from api.charts_route import *
 from api.proposals_route import *
 from api.user_routes import *

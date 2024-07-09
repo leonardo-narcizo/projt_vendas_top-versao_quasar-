@@ -8,7 +8,7 @@
       <div class="car-list">
         <!-- Carro Vendido 1 -->
         <div class="car-item">
-          <img src="https://quatrorodas.abril.com.br/wp-content/uploads/2019/08/mg_8201.cr2_-e1565631914753.jpg?quality=70&strip=info" alt="Fiat Uno" class="car-image">
+          <img :src="urlImage" alt="Fiat Uno" class="car-image">
           <div class="car-info">Fiat Uno</div>
         </div>
         <!-- Carro Vendido 2 -->
@@ -103,13 +103,17 @@
 </template>
 
 <script>
+import { computed } from 'vue';
 import { useStore } from 'vuex';
 
 export default {
   setup() {
     const store = useStore();
+    const urlImage = computed(() => store.getters['car/getUrlImage'])
   
-    return {};
+    return {
+      urlImage
+    };
   },
 };
 </script>
@@ -142,7 +146,7 @@ export default {
 .car-image {
   width: 100%;
   height: auto;
-  max-height: 150px; /* Define uma altura máxima para a imagem */
+  max-height: 270px; /* Define uma altura máxima para a imagem */
   object-fit: cover; /* Faz com que a imagem se ajuste dentro do card, mantendo a proporção */
   border-radius: 5px;
   margin-bottom: 0.5rem;

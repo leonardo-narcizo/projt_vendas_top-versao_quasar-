@@ -14,3 +14,7 @@ export function getCars(state) {
 export function getSearchResult(state) {
     return state.searchResult
 }
+
+export function getUrlImage(state) {
+    return state.urlImage
+}

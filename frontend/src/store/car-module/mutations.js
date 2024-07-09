@@ -13,3 +13,7 @@ export function setCarsOnList (state, cars) {
 export function setSearchResult (state, result) {
     state.searchResult = result
 }
+
+export function setUrlImage (state, url) {
+    state.urlImage = url
+}

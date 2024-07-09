@@ -6,7 +6,7 @@
         <div class="text-subtitle2 q-mb-xs">Preencha o formulário abaixo com os dados do seu carro:</div>
       </q-card-section>
       <q-card-section>
-        <q-form @submit="handleSubmit" class="form">
+        <q-form @submit.prevent="handleSubmit" class="form" enctype="multipart/form-data">
           <q-input v-model="marca" label="Digite o fabricante" type="text" standard />
           <q-input v-model="modelo" label="Digite o modelo" type="text" standard />
           <q-input v-model="ano" label="Digite o ano de fabricação" type="number" standard />
@@ -57,16 +57,6 @@ export default {
     const isPosted = computed(() => store.getters['car/getIsPosted']);
     const postResult = computed(() => store.getters['car/getPostResult']);
 
-
-    const convertFileToBase64 = (file) => {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result.split(',')[1]);
-        reader.onerror = error => reject(error);
-        reader.readAsDataURL(file);
-      });
-    };
-
     const handleFileChange = (files) => {
       file.value = files[0];
     };
@@ -80,23 +70,18 @@ export default {
         return;
       }
 
-      // Converte o arquivo para Base64, se necessário
-      let carImageBase64 = null;
-      if (file.value) {
-        carImageBase64 = await convertFileToBase64(file.value);
-        console.log('imagem convertida antes da request: ', carImageBase64)
-      }
+      // Criando um novo FormData
+      const formData = new FormData();
+      formData.append('marca', marca.value);
+      formData.append('modelo', modelo.value);
+      formData.append('ano', ano.value);
+      formData.append('quilometragem', quilometragem.value);
+      formData.append('preco', preco.value);
+      formData.append('username', username)
+      formData.append('car_image', file.value); // Adicionando o arquivo de imagem
 
-      // Envie para o backend
-      await store.dispatch('car/postCar', {
-        marca: marca.value,
-        modelo: modelo.value,
-        ano: ano.value,
-        quilometragem: quilometragem.value,
-        preco: preco.value,
-        car_image: carImageBase64, // Aqui você envia a imagem convertida para Base64
-        username: username
-      });
+      // Envie para o backend usando FormData
+      await store.dispatch('car/postCar', formData);
 
       if (isPosted.value) {
         showFooter.value = true;
@@ -108,8 +93,6 @@ export default {
         footerMessage.value = postResult.value;
       }
     };
-
-    
 
     return {
       marca,

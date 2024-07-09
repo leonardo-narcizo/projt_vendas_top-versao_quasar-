@@ -1,28 +1,18 @@
-export async function postCar ({ commit }, { marca, modelo, ano, quilometragem, preco, car_image, username }) {
+export async function postCar ({ commit }, formData) {
     let postResult = ''
 
     try {
         const response = await fetch('http://localhost:5000/criarCarro', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                marca,
-                modelo,
-                ano,
-                quilometragem,
-                preco,
-                car_image,
-                username
-            })
+            body: formData
         })
 
         const data = await response.json()
         postResult = data.message
 
-        if (postResult === 'carro cadastrado para venda!') {
+        if (postResult === 'Carro cadastrado para venda!') {
             commit('setIsPosted', true)
+            commit('setUrlImage', data.url_imagem)
         }
     }
     catch(err) {
@@ -31,6 +21,7 @@ export async function postCar ({ commit }, { marca, modelo, ano, quilometragem, 
     }
     finally {
         commit('setPostResult', postResult)
+        console.log('msg do servidor: ', postResult)
     }
 }
 

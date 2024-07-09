@@ -2,7 +2,14 @@ from flask import Flask, jsonify, request
 import datetime
 from services.users import Usuario, SECRET_KEY
 from db.db_config import conectar_db
-import base64
+from google.cloud import storage
+import uuid
+import os
+
+storage_client = storage.Client.from_service_account_json(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
+bucket_name = 'images_car_sp'
+
+
 
 
 
@@ -39,83 +46,58 @@ def car_routes(app):
         conexao_db.close()
 
         return jsonify({'lista_carros': carros})
-        
+    
 
-    ### Rota para criar um carro novo
-
-    # Proximos passos: Começar um projeto dentro do google cloud dai pegar a imagem codificada em base64 q chega la do frontend
-    # e dai decodificar p binário novamente as imagens aq na API e armazenar dentro da pasta de uploads
-    # e então fazer c q isso tudo seja armazenado na nuvem
-    # Dai no banco na coluna 'car_image' será guardado apenas o caminho da imagem, p n sobrecarregar o banco(pois são grandes as imagens)
-
-    ##### ROta completa cmomenada: 
-#     @app.route('/criarCarro', methods=['POST'])
-# def criar_carro():
-#     data = request.json
-
-#     if 'marca' in data and 'modelo' in data and 'ano' in data and 'quilometragem' in data and 'preco' in data and 'car_image' in data and 'username' in data:
-#         conexao_db, cursor = conectar_db()
-
-#         if conexao_db is None:
-#             return jsonify(cursor), 500
-
-#         # Decode the base64 image
-#         if ',' in data['car_image']:
-#             imagem_bytes = base64.b64decode(data['car_image'].split(',')[1])
-#         else:
-#             imagem_bytes = base64.b64decode(data['car_image'])
-
-#         # Save the image to the filesystem
-#         filename = secure_filename(f"{data['username']}_{data['modelo']}.png")
-#         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-#         with open(file_path, 'wb') as f:
-#             f.write(imagem_bytes)
-
-#         # Atrelando o novo carro ao proprietário, através do username
-#         id_usuario = Usuario.get_user_id(data['username'])  # Isso retorna o id do usuário que está logado
-
-#         # Inserindo o carro no estoque, e ainda inserindo qual é o seu proprietário
-#         cursor.execute('INSERT INTO carros (marca, modelo, ano, quilometragem, preco, usuario_id, car_image_path) VALUES (%s, %s, %s, %s, %s, %s, %s)',
-#                        [data['marca'], data['modelo'], data['ano'], data['quilometragem'], data['preco'], id_usuario, file_path])
-#         conexao_db.commit()
-#         conexao_db.close()
-
-#         return jsonify({'message': 'Carro cadastrado para venda!'}), 201
-#     else:
-#         return jsonify({'message': 'Não foi possível cadastrar o seu carro! Verifique os campos e tente novamente'}), 400
-
-
+    ### Rota para cadastrar novo carro
     @app.route('/criarCarro', methods=['POST'])
     def criar_carro():
-        data = request.json
+        try:
+            # Recebe os dados do formulário e a imagem do carro
+            marca = request.form.get('marca')
+            modelo = request.form.get('modelo')
+            ano = request.form.get('ano')
+            quilometragem = request.form.get('quilometragem')
+            preco = request.form.get('preco')
+            username = request.form.get('username')
+            car_image = request.files.get('car_image')
 
-        if 'marca' in data and 'modelo' in data and 'ano' in data and 'quilometragem' in data and 'preco' in data and 'car_image' in data and 'username' in data:
+            # Validação dos dados
+            if not marca or not modelo or not ano or not quilometragem or not preco or not username or not car_image:
+                return jsonify({'message': 'Preencha todos os campos e anexe uma imagem'}), 400
+
+            # Gerar um nome único para o arquivo no Cloud Storage
+            filename = str(uuid.uuid4()) + '-' + car_image.filename
+            blob = storage_client.bucket(bucket_name).blob(filename)
+
+            # Upload da imagem para o Google Cloud Storage
+            blob.upload_from_file(car_image)
+
+            # Tornar o objeto público
+            blob.make_public()
+
+            # Obter a URL pública da imagem
+            url_imagem = blob.public_url
+
+            # Salvar apenas a URL da imagem no banco de dados
+            # Implemente a lógica para salvar no banco de dados MySQL aqui
             conexao_db, cursor = conectar_db()
 
             if conexao_db is None:
                 return jsonify(cursor), 500
             
-            if ',' in data['car_image']:
-                imagem_bytes = base64.b64decode(data['car_image'].split(',')[1])
-            else:
-                # Lidar com o erro ou retornar uma resposta apropriada
-                return jsonify({'message': 'Formato inválido da imagem Base64'}), 400
-                # Convertendo a imagem q virá em base64 para formato binário novamente
-                imagem_bytes = base64.b64decode(data['car_image'].split(',')[1])  # Remove o prefixo 'data:image/png;base64,'
-            
-            
             # Atrelando o novo carro ao proprietário, através do username
-            id_usuario = Usuario.get_user_id(data['username']) # Isso retorna o id do usuário que está logado
+            id_usuario = Usuario.get_user_id(username)  # Isso retorna o id do usuário que está logado
 
             # Inserindo o carro no estoque, e ainda inserindo qual é o seu proprietário
-            cursor.execute('INSERT INTO carros (marca, modelo, ano, quilometragem, preco, usuario_id, car_image) VALUES (%s, %s, %s, %s, %s, %s, %s)', [data['marca'], data['modelo'], data['ano'], data['quilometragem'], data['preco'], id_usuario, imagem_bytes])
+            cursor.execute('INSERT INTO carros (marca, modelo, ano, quilometragem, preco, usuario_id, car_image_path) VALUES (%s, %s, %s, %s, %s, %s, %s)',
+                       (marca, modelo, ano, quilometragem, preco, id_usuario, url_imagem))
             conexao_db.commit()
             conexao_db.close()
 
-            return jsonify({'message': 'carro cadastrado para venda!' }), 201
-            
-        else:
-            return jsonify({'message': 'Não foi possivel cadastrar o seu carro! Verifique os campos e tente novamente'}), 400
+            return jsonify({'message': 'Carro cadastrado para venda!', 'url_imagem': url_imagem}), 201
+
+        except Exception as e:
+            return jsonify({'message': str(e)}), 500
 
 
     ### Rota para atualizar carro existente

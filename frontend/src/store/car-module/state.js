@@ -11,7 +11,8 @@ export default function () {
         postResult: ''
       },
       listaCarros: [], // Recebe um array para armazenar os carros recebidos da API
-      searchResult: ''
+      searchResult: '',
+      urlImage: ''
     }
   }
   
