@@ -19,14 +19,17 @@ class Usuario:
         # Conectar ao banco
         conexao_db, cursor = conectar_db()
 
+        if conexao_db is None:
+            return jsonify({'message': 'Erro de conexão com o banco de dados'}), 500
+
         # Verificando se o usuário existe no banco
         cursor.execute("SELECT * FROM usuarios WHERE username = %s", (self.username,))
         user = cursor.fetchone()
-        user_type = user[3]
         cursor.close()
 
         if user:
             stored_password = user[2]
+            user_type = user[3]
 
             # Comparando senha enviada na request c/ senha aarmazena no banco
             if bcrypt.checkpw(self.password.encode('utf-8'), stored_password.encode('utf-8')):
@@ -35,9 +38,9 @@ class Usuario:
 
                 return jsonify({'token': token, 'user_type': user_type, 'message': 'Autenticação bem-sucedida!'})
             else:
-                return jsonify({'message': 'Senha incorreta!'})
+                return jsonify({'message': 'Senha incorreta!'}), 401
         else:
-            return jsonify({'message': 'Usuário não encotrado!'})
+            return jsonify({'message': 'Usuário não encotrado!'}), 404
         
     @staticmethod
     def verificar_token(token):

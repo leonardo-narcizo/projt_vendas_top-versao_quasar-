@@ -14,6 +14,8 @@ export function setSearchResult (state, result) {
     state.searchResult = result
 }
 
-export function setUrlImage (state, url) {
-    state.urlImage = url
+export function setLastestSoldCars (state, cars) {
+    state.lastestSoldCars.first = cars[0]
+    state.lastestSoldCars.second = cars[1]
+    state.lastestSoldCars.third = cars[2]
 }

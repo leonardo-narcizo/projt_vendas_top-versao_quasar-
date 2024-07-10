@@ -12,7 +12,16 @@ export default function () {
       },
       listaCarros: [], // Recebe um array para armazenar os carros recebidos da API
       searchResult: '',
-      urlImage: ''
+      lastestSoldCars: {
+        first: null,
+        second: null,
+        third: null
+      },
+      lastestCreatedCars: {
+        first: null,
+        second: null,
+        third: null
+      }
     }
   }
   

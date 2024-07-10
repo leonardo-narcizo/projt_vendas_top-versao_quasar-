@@ -26,7 +26,7 @@ def proposals_route(app):
             return response
         
         else:
-            return jsonify({'message': 'Erro ao enviar proposta! Preencha todos os campos corretamente.'})
+            return jsonify({'message': 'Erro ao enviar proposta! Preencha todos os campos corretamente.'}), 400
         
 
     @app.route('/showReceivedProposals', methods=['POST'])

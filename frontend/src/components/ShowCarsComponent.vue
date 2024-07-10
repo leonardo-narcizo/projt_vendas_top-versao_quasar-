@@ -1,30 +1,57 @@
 <template>
-    <div id="carro-container">
-      <div v-for="carro in carros" :key="carro.id" class="carro">
-        <div class="carro-texto text-center text-subtitle2">
-          | Marca: {{ carro.marca }} | Modelo: {{ carro.modelo }} | Ano: {{ carro.ano }} | Quilometragem: {{ carro.quilometragem }} | Preço: {{ carro.preco }} | Proprietário: {{ carro.proprietario }}
+  <div id="carro-container">
+    <div v-for="carro in carros" :key="carro.id" class="carro">
+      <div class="carro-info">
+        <div class="carro-texto">
+          <div>
+            <span><strong>Marca:</strong></span> {{ carro.marca }}
+          </div>
+          <div>
+            <span><strong>Modelo:</strong></span> {{ carro.modelo }}
+          </div>
+          <div>
+            <span><strong>Ano:</strong></span> {{ carro.ano }}
+          </div>
+          <div>
+            <span><strong>Quilometragem:</strong></span> {{ carro.quilometragem }}
+          </div>
+          <div>
+            <span><strong>Preço:</strong></span> {{ carro.preco }}
+          </div>
+          <div>
+            <span><strong>Proprietário:</strong></span> {{ carro.proprietario }}
+          </div>
         </div>
-        <div class="text-center q-pt-sm">
-          <q-btn color="secondary" text-color="black" @click="showMakeProposal(carro)">Fazer Proposta</q-btn>
+        <div class="carro-imagem">
+          <img v-if="carro.car_image != null" :src="carro.car_image" alt="sem imagem" class="car-image" />
+          <div v-else class="image-placeholder">
+            <span>Este carro não possui imagem</span>
+        </div>
+          <div class="text-right q-pt-sm">
+            <q-btn color="secondary" text-color="black" @click="showMakeProposal(carro)">
+              Fazer Proposta
+            </q-btn>
+          </div>
         </div>
       </div>
-
-      <!-- Dialog para fazer proposta -->
-      <MakeProposal 
-        v-model="isDialogOpen"
-        @proposalSent="handleTrySendProposal"
-        :carDescription="currentCar"
-      />
-
-      <!--Componente do footer p dar o feedback sobre a proposta-->
-      <status-on-footer
-        :show-footer="showFooter"
-        :status="footerStatus"
-        :message="footerMessage"
-        @update-show-footer="updateShowFooter"
-      />
     </div>
-  </template>
+
+    <!-- Dialog para fazer proposta -->
+    <MakeProposal
+      v-model="isDialogOpen"
+      @proposalSent="handleTrySendProposal"
+      :carDescription="currentCar"
+    />
+
+    <!-- Componente do footer para dar feedback sobre a proposta -->
+    <StatusOnFooter
+      :show-footer="showFooter"
+      :status="footerStatus"
+      :message="footerMessage"
+      @update-show-footer="updateShowFooter"
+    />
+  </div>
+</template>
   
   <script>
   import { ref, computed } from 'vue'
@@ -111,21 +138,54 @@
   
   <style lang="scss" scoped>
   #carro-container {
-    max-width: 800px; /* Aumentando a largura */
-    margin: 0 auto; /* Centraliza horizontalmente */
-    text-align: left; /* Alinha o texto à esquerda */
+    max-width: 800px;
+    margin: 0 auto;
     background-color: transparent;
   }
   
   .carro {
-    
     margin-top: 25px;
     border: 5px solid black;
     border-radius: 5px;
     padding: 10px;
-    position: relative; /* Torna a posição relativa para alinhar o botão */
-    width: 100%; /* Define a largura para ocupar todo o espaço disponível */
     background-color: white;
   }
+  
+  .carro-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .carro-texto {
+    width: 50%;
+  }
+  
+  .carro-imagem {
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .car-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 0.5rem;
+  }
+
+  .image-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-color: #f0f0f0; /* Cor de fundo para a moldura */
+    color: #666;
+    font-size: 18px;
+}
   </style>
+
   

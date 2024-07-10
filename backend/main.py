@@ -13,6 +13,7 @@ from api.proposals_route import *
 from api.user_routes import *
 from api.car_routes import *
 from api.socket_routes import *
+from api.news_routes import *
 
 #### API config
 app = Flask(__name__)
@@ -23,17 +24,16 @@ app.json.sort_keys = False
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 
-
-
 ### Importação rotas http
 criar_rotas_graficos(app)
 proposals_route(app)
 user_routes(app)
-car_routes(app)
+car_routes(app, socketio)
+
 
 ### Importação rotas socket
-
 socket_routes(socketio)
+news_routes(socketio)
 
 @socketio.on('connect')
 def handle_connect():
@@ -42,7 +42,6 @@ def handle_connect():
 @socketio.on('disconnect')
 def handle_disconnect():
     print('Conexão sockeIO encerrada!')
-
 
 
 if __name__ == '__main__':

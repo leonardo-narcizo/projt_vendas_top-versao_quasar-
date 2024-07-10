@@ -1,3 +1,4 @@
+import { data } from 'autoprefixer';
 import io from 'socket.io-client'
 
 let socket = null
@@ -191,6 +192,12 @@ export async function criarNovoChat({ commit }, { proprietarioUsername, comprado
   }
 }
 
+
+export async function listenSoldCar() {
+  socket.on('new_sold_car', (new_sold_car) => {
+    console.log(new_sold_car.carro_vendido)
+  })
+}
 
 
 

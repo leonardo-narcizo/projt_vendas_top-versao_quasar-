@@ -17,7 +17,7 @@
         <q-card-section>
           <!-- Conteúdo do formulário de proposta -->
           <q-input v-model="descricao" placeholder="Digite uma descrição da proposta" />
-          <q-input v-model="proposalPrice" placeholder="Digite o preço inicial de negociação" />
+          <q-input type="number" v-model="proposalPrice" placeholder="Digite o preço inicial de negociação" no-stepper />
         </q-card-section>
   
         <q-card-actions align="right">

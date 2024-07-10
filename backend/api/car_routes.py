@@ -5,6 +5,7 @@ from db.db_config import conectar_db
 from google.cloud import storage
 import uuid
 import os
+import time
 
 storage_client = storage.Client.from_service_account_json(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
 bucket_name = 'images_car_sp'
@@ -14,7 +15,7 @@ bucket_name = 'images_car_sp'
 
 
 
-def car_routes(app):
+def car_routes(app, socketio):
     ### Rota para obter a lista 'Carros'
     @app.route('/carros', methods=['GET'])
     def mostrar_carros():
@@ -39,7 +40,8 @@ def car_routes(app):
                 'ano': row[3] ,
                 'quilometragem': row[4],
                 'preco': row[5],
-                'proprietario': row[9]
+                'proprietario': row[10],
+                'car_image': row[9]
                 }
             )
         
@@ -52,6 +54,7 @@ def car_routes(app):
     @app.route('/criarCarro', methods=['POST'])
     def criar_carro():
         try:
+            start_time = time.time()
             # Recebe os dados do formulário e a imagem do carro
             marca = request.form.get('marca')
             modelo = request.form.get('modelo')
@@ -69,8 +72,12 @@ def car_routes(app):
             filename = str(uuid.uuid4()) + '-' + car_image.filename
             blob = storage_client.bucket(bucket_name).blob(filename)
 
+            upload_start = time.time()
             # Upload da imagem para o Google Cloud Storage
             blob.upload_from_file(car_image)
+            upload_end = time.time()
+
+            print(f"Time taken for upload: {upload_end - upload_start} seconds")
 
             # Tornar o objeto público
             blob.make_public()
@@ -87,12 +94,18 @@ def car_routes(app):
             
             # Atrelando o novo carro ao proprietário, através do username
             id_usuario = Usuario.get_user_id(username)  # Isso retorna o id do usuário que está logado
-
+            db_start = time.time()
             # Inserindo o carro no estoque, e ainda inserindo qual é o seu proprietário
             cursor.execute('INSERT INTO carros (marca, modelo, ano, quilometragem, preco, usuario_id, car_image_path) VALUES (%s, %s, %s, %s, %s, %s, %s)',
                        (marca, modelo, ano, quilometragem, preco, id_usuario, url_imagem))
             conexao_db.commit()
             conexao_db.close()
+            db_end = time.time()
+
+            print(f"Time taken for DB operations: {db_end - db_start} seconds")
+
+            end_time = time.time()
+            print(f"Total time taken: {end_time - start_time} seconds")
 
             return jsonify({'message': 'Carro cadastrado para venda!', 'url_imagem': url_imagem}), 201
 
@@ -134,33 +147,54 @@ def car_routes(app):
     def handle_sell_car():
         data = request.json
 
-        if 'comprador_username' in data and 'id_carro' in data:
+        if 'comprador_username' in data and 'id_carro' in data and 'preco_proposto' in data:
             conexao_db, cursor = conectar_db()
 
             if conexao_db is None:
                 return jsonify(cursor), 500
 
-            id_usuario = Usuario.get_user_id(data['comprador_username']) # Isso retorna o id do usuário que está logado
+            try:
+                id_usuario = Usuario.get_user_id(data['comprador_username'])  # Isso retorna o id do usuário que está logado
 
-            cursor.execute('SELECT * FROM carros WHERE id = %s', (data['id_carro'],))
-            carro = cursor.fetchone()
+                cursor.execute('SELECT * FROM carros WHERE id = %s', (data['id_carro'],))
+                carro = cursor.fetchone()
 
-            if carro:
-                id_novo_antigo_dono = carro[7]
-                cursor.execute('UPDATE carros SET usuario_id = %s, id_antigo_dono = %s WHERE id = %s', 
-                            (id_usuario, id_novo_antigo_dono, data['id_carro']))
-                conexao_db.commit()
+                if carro:
+                    id_novo_antigo_dono = carro[7]
 
-                # Depois da compra, atualizar a coluna 'data_compra' (essa coluna agr foi atualizda p type 'DATETIME')
-                data_atual = datetime.datetime.now()
+                    # Inicia uma transação
+                    conexao_db.begin()
 
-                cursor.execute('UPDATE carros SET data_compra = %s WHERE id = %s', 
-                            (data_atual, data['id_carro']))
-                conexao_db.commit()
+                    # Atualiza o proprietário do carro
+                    cursor.execute('UPDATE carros SET usuario_id = %s, id_antigo_dono = %s WHERE id = %s', 
+                                (id_usuario, id_novo_antigo_dono, data['id_carro']))
+
+                    # Atualiza a data de compra
+                    data_atual = datetime.datetime.now()
+                    cursor.execute('UPDATE carros SET data_compra = %s WHERE id = %s', 
+                                (data_atual, data['id_carro']))
+
+                    # Atualiza o preço do carro
+                    cursor.execute('UPDATE carros SET preco = %s WHERE id = %s', 
+                                (data['preco_proposto'], data['id_carro']))
+
+                    # Confirma a transação
+                    conexao_db.commit()
+
+                    # Emitindo que um novo carro foi vendido
+                    socketio.emit('new_sold_car', {'carro_vendido': 'verdadeiro'})
+                    print('vendido carro emitido')
+
+                    return jsonify({'message': 'carro vendido com sucesso!'}), 200
+                else:
+                    return jsonify({'message': '[erro] carro não encontrado.'}), 404
+            except Exception as e:
+                conexao_db.rollback()
+                print(f'Erro ao vender carro: {e}')
+                return jsonify({'message': '[erro] Erro ao vender carro.'}), 500
+            finally:
                 cursor.close()
-                return jsonify({'message': 'carro vendido com sucesso!'}), 200
-            else:
-                return jsonify({'message': '[erro] carro não encontrado.'}), 404
+                conexao_db.close()
         else:
             return jsonify({'message': '[erro] Dados insuficientes fornecidos.'}), 400
 

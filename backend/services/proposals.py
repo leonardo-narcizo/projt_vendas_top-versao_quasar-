@@ -28,7 +28,7 @@ class Proposta:
             cursor.close()
             return jsonify({'message': 'Proposta enviada com sucesso!'}), 201
         except Exception as e:
-            return jsonify({'message': str(e)})
+            return jsonify({'message': str(e)}), 500
         
 
     @staticmethod

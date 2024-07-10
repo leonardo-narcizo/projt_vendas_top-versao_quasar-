@@ -10,10 +10,6 @@ def user_routes(app):
         data = request.json
 
         if 'username' in data and 'password' in data:
-            conexao_db, cursor = conectar_db()
-
-            if conexao_db is None:
-                return jsonify(cursor), 500
             
             # Declarando que se os dados da requisição forem bem sucedidos, o usuario vira uma nova instânica da classe 'Usuario'
             usuario = Usuario(data['username'], data['password'])

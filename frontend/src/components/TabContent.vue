@@ -189,7 +189,11 @@ export default {
 
     const rejectProposal = () => actionOnProposal('proposal/rejectProposal', { id_proposta: selectedProposal.value.id_proposta });
     const cancelProposal = () => actionOnProposal('proposal/cancelProposal', { id_proposta: selectedProposal.value.id_proposta })
-    const acceptProposal = () => actionOnProposal('proposal/acceptProposal', {  id_proposta: selectedProposal.value.id_proposta, id_carro: selectedProposal.value.id_carro, comprador_username: selectedProposal.value.comprador_username })
+    const acceptProposal = () => {
+      actionOnProposal('proposal/acceptProposal', {  id_proposta: selectedProposal.value.id_proposta, preco_proposto:selectedProposal.value.preco_proposto, id_carro: selectedProposal.value.id_carro, comprador_username: selectedProposal.value.comprador_username })
+
+      store.dispatch('chat/listenSoldCar')
+    }
 
     const negotiateProposal = async () => {
       console.log('Iniciar negociação:', selectedProposal.value);

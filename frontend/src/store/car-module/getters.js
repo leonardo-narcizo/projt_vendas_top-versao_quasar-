@@ -15,6 +15,6 @@ export function getSearchResult(state) {
     return state.searchResult
 }
 
-export function getUrlImage(state) {
-    return state.urlImage
+export function getLastestSoldCars (state) {
+    return state.lastestSoldCars
 }

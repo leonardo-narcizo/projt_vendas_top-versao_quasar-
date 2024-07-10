@@ -29,6 +29,7 @@ export async function sendProposal({ commit }, { id_carro, nome_proprietario, no
     }
     finally {
         commit('setSendProposalResult', sendProposalResult)
+        console.log('situacao da proposta', sendProposalResult)
     }
 }
 
@@ -164,7 +165,7 @@ export async function negotiateProposal({ commit }, { id_proposta }) {
 }
 
 
-export async function acceptProposal({ commit }, { id_proposta, id_carro, comprador_username }) {
+export async function acceptProposal({ commit }, { id_proposta, preco_proposto, id_carro, comprador_username }) {
     let proposalMessageResult = ''
 
     try {
@@ -186,7 +187,7 @@ export async function acceptProposal({ commit }, { id_proposta, id_carro, compra
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ id_carro, comprador_username})
+                    body: JSON.stringify({ id_carro, preco_proposto, comprador_username})
                 })
 
                 const saleData = await saleResponse.json()
