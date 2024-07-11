@@ -12,7 +12,6 @@ export async function postCar ({ commit }, formData) {
 
         if (postResult === 'Carro cadastrado para venda!') {
             commit('setIsPosted', true)
-            commit('setUrlImage', data.url_imagem)
         }
     }
     catch(err) {
@@ -67,4 +66,23 @@ export async function searchByQuilometragem({ commit }, { quilometragem_minima, 
 
 export async function searchByPreco({ commit }, { preco_minimo, preco_maximo }) {
     return await fetchData({ commit }, 'http://localhost:5000/preco', { preco_minimo, preco_maximo });
+}
+
+
+export async function searchLastestSoldCars( { commit } ) {
+    try {
+        const response = await fetch('http://localhost:5000/lastestSoldCars')
+        
+        const data = await response.json()
+
+        if (response.ok) {
+            commit('setLastestSoldCars', data.lastest_sold_cars)
+        }
+        else {
+            commit('setSearchResult', data.message)
+        }
+    }
+    catch (err) {
+        console.error('[erro]: ', err)
+    }
 }

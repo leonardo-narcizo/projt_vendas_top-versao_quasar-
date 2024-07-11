@@ -103,7 +103,7 @@ export default {
 
     onBeforeMount(async () => {
         try {
-          await store.dispatch('chat/connectSocket');
+          await store.dispatch('socket/connectSocket');
         } catch (error) {
           console.error('Erro ao conectar ao servidor Socket.IO:', error);
         }
@@ -111,7 +111,7 @@ export default {
 
     onBeforeUnmount(async () => {
         try {
-          await store.dispatch('chat/disconnectSocket');
+          await store.dispatch('socket/disconnectSocket');
         } catch (error) {
           console.error('Erro ao desconectar ao servidor Socket.IO:', error);
         }

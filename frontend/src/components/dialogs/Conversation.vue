@@ -70,13 +70,13 @@ export default {
     const chatMessages = ref([]); // Usando ref para armazenar as mensagens do chat
     const newMessage = ref('');
     const messagesContainer = ref(null)
-    const newMessageReceived = computed(() => store.getters['chat/getNewMessageTrue'])
+    const newMessageReceived = computed(() => store.getters['socket/getNewMessageTrue'])
 
 
     const fetchChatMessages = async () => {
       try {
-        await store.dispatch('chat/searchChatMessages', { id_chat: props.chat.id_chat });
-        chatMessages.value = store.getters['chat/getChatMessages'];
+        await store.dispatch('socket/searchChatMessages', { id_chat: props.chat.id_chat });
+        chatMessages.value = store.getters['socket/getChatMessages'];
       } catch (error) {
         console.error('Erro ao buscar mensagens do chat:', error);
       }
@@ -94,7 +94,7 @@ export default {
       };
 
       try {
-        await store.dispatch('chat/sendMessage', messageData);
+        await store.dispatch('socket/sendMessage', messageData);
         newMessage.value = ''; // Limpando o input após o envio
         await fetchChatMessages(); // Atualizar mensagens após enviar uma nova
         scrollToBottom(); // Rolando para o final após enviar mensagem
@@ -137,14 +137,14 @@ export default {
       await fetchChatMessages();
 
       // Ouvir evento de nova mensagem enviada
-      await store.dispatch('chat/listenForMessages', props.chat.id_chat);
+      await store.dispatch('socket/listenForMessages', props.chat.id_chat);
 
       scrollToBottom();
     });
 
     onBeforeUnmount(() => {
       // Remover listener ao desmontar o componente
-      store.dispatch('chat/removeMessagesListener');
+      store.dispatch('socket/removeMessagesListener');
     });
 
     return {

@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 import datetime
 from services.users import Usuario, SECRET_KEY
+from services.cars_service import CarsService
 from db.db_config import conectar_db
 from google.cloud import storage
 import uuid
@@ -161,9 +162,6 @@ def car_routes(app, socketio):
 
                 if carro:
                     id_novo_antigo_dono = carro[7]
-
-                    # Inicia uma transação
-                    conexao_db.begin()
 
                     # Atualiza o proprietário do carro
                     cursor.execute('UPDATE carros SET usuario_id = %s, id_antigo_dono = %s WHERE id = %s', 
@@ -428,3 +426,15 @@ def car_routes(app, socketio):
                                 'message': message}), 404
             else:
                 return jsonify({'lista_carros': carros})
+            
+
+            
+    # Amanhã muda essa rota p socket, pois conforme ocorram trnasações, atualiza a homePage la do frontend automáticamente
+    @app.route('/lastestSoldCars', methods=['GET'])
+    def handle_lastest_sold_cars():
+        response = CarsService.search_latest_sold_cars()
+
+        if response is None:
+            return jsonify({'message': 'Erro ao buscar carros'}), 400
+        else:
+            return response

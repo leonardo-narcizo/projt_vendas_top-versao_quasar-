@@ -6,20 +6,21 @@
     <div class="section">
       <h5>Últimos Carros Vendidos</h5>
       <div class="car-list">
+        <q-spinner v-if="!lastestSoldCars || !lastestSoldCars.first" color="secondary" size="100px" class="text-center" />
         <!-- Carro Vendido 1 -->
-        <div class="car-item">
-          <img :src="urlImage" alt="Fiat Uno" class="car-image">
-          <div class="car-info">Fiat Uno</div>
+        <div clickable @click="see"  class="car-item" v-if="lastestSoldCars.first">
+          <img :src="lastestSoldCars.first.car_image_path" alt="Fiat Uno" class="car-image">
+          <div class="car-info">{{ lastestSoldCars.first.marca }} {{ lastestSoldCars.first.modelo }}</div>
         </div>
         <!-- Carro Vendido 2 -->
-        <div class="car-item">
-          <img src="https://3.bp.blogspot.com/-vopx9ywF2Qc/U4QmoCvkekI/AAAAAAABW_U/OhjB3glJfSk/s1600/Novo-Honda-Civic-2015+(1).jpg" alt="Honda Civic" class="car-image">
-          <div class="car-info">Honda Civic</div>
+        <div class="car-item" v-if="lastestSoldCars.second">
+          <img :src="lastestSoldCars.second.car_image_path" alt="Honda Civic" class="car-image">
+          <div class="car-info">{{ lastestSoldCars.second.marca }} {{ lastestSoldCars.second.modelo }}</div>
         </div>
         <!-- Carro Vendido 3 -->
-        <div class="car-item">
-          <img src="https://th.bing.com/th/id/OIP.lHoc9Mh-pd7arpvhqG4ZnQAAAA?rs=1&pid=ImgDetMain" alt="Ford Fusion" class="car-image">
-          <div class="car-info">Ford Fusion</div>
+        <div class="car-item" v-if="lastestSoldCars.third">
+          <img :src="lastestSoldCars.third.car_image_path" alt="Ford Fusion" class="car-image">
+          <div class="car-info">{{ lastestSoldCars.third.marca }} {{ lastestSoldCars.third.modelo }}</div>
         </div>
       </div>
     </div>
@@ -103,16 +104,34 @@
 </template>
 
 <script>
-import { computed } from 'vue';
+import { computed, ref, onMounted, onBeforeMount } from 'vue';
 import { useStore } from 'vuex';
 
 export default {
   setup() {
     const store = useStore();
-    const urlImage = computed(() => store.getters['car/getUrlImage'])
+    const lastestSoldCars = computed(() => store.getters['car/getLastestSoldCars'])
+
+    onBeforeMount(async () => {
+      await store.dispatch('car/searchLastestSoldCars')
+      await store.dispatch('socket/listenSoldCar')
+
+      console.log('esses sao os carros vendidos: ', lastestSoldCars.value)
+
+
+    })
+
+    const see = () => {
+      console.log('clicouu!')
+      // Aqui terá um dialog com os detalhes da transação
+    }
+
+
+
   
     return {
-      urlImage
+      lastestSoldCars,
+      see
     };
   },
 };
@@ -141,6 +160,7 @@ export default {
   flex: 1 1 calc(33% - 1rem);
   box-sizing: border-box;
   text-align: center; /* Adiciona centralização ao conteúdo */
+  cursor: pointer;
 }
 
 .car-image {
@@ -167,4 +187,5 @@ export default {
   border: 1px solid black;
   border-radius: 5px;
 }
+
 </style>

@@ -4,7 +4,7 @@ import { createStore } from 'vuex'
 import user from './user-module'
 import car from './car-module'
 import proposal from './proposal-module'
-import chat from './chat-module'
+import socket from './socket-module'
 
 /*
  * If not building with SSR mode, you can
@@ -21,7 +21,7 @@ export default store(function (/* { ssrContext } */) {
       user,
       car,
       proposal,
-      chat
+      socket
     },
 
     // enable strict mode (adds overhead!)

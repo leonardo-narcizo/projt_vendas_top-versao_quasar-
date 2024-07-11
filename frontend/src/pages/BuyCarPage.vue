@@ -111,7 +111,7 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useStore } from 'vuex'
 import StatusOnFooter from 'src/components/StatusOnFooter.vue'
 import ShowCarsComponentVue from '../components/ShowCarsComponent.vue'
@@ -136,6 +136,22 @@ export default {
     const errorMessage = computed(() => store.getters['car/getSearchResult'])
     
     const store = useStore()
+
+    onMounted(async () => {
+      try {
+        await searchCar()
+        showCars.value = true
+        
+      }
+      catch (err) {
+        console.error('erro ao buscar os carros', err)
+        showCars.value = false
+      }
+    })
+
+    onBeforeUnmount(() => {
+      showCars.value = false
+    })
 
     const filters = ref({
       marca: false,

@@ -192,7 +192,7 @@ export default {
     const acceptProposal = () => {
       actionOnProposal('proposal/acceptProposal', {  id_proposta: selectedProposal.value.id_proposta, preco_proposto:selectedProposal.value.preco_proposto, id_carro: selectedProposal.value.id_carro, comprador_username: selectedProposal.value.comprador_username })
 
-      store.dispatch('chat/listenSoldCar')
+      store.dispatch('socket/listenSoldCar')
     }
 
     const negotiateProposal = async () => {
@@ -207,7 +207,7 @@ export default {
         // Após a aba ser trocada, criar um novo chat
         setTimeout(async () => {
           try {
-            await store.dispatch('chat/criarNovoChat', {
+            await store.dispatch('socket/criarNovoChat', {
               proprietarioUsername: selectedProposal.value.proprietario_username,
               compradorUsername: selectedProposal.value.comprador_username,
               idCarro: selectedProposal.value.id_carro

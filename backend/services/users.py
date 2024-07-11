@@ -66,22 +66,40 @@ class Usuario:
         
     @staticmethod # Método que da para acessar mesmo sem ser instância da classe
     def criar_usuario(username, password, cnpj=None):
-        # Conectar novamente ao banco
-        conexao_db, cursor = conectar_db()
+        try:
+            # Conectar novamente ao banco
+            conexao_db, cursor = conectar_db()
 
-        if cnpj:
-            user_type = 'empresa'
-        else:
-            user_type = 'fisica'        
+            if conexao_db is None:
+                return jsonify(cursor), 500
 
-        # Gerar hash antes de armazenar senha
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        # Inserir novo usuário dentro do banco
-        cursor.execute('INSERT INTO usuarios (username, password, user_type, cnpj) VALUES (%s, %s, %s, %s)', (username, hashed_password, user_type, cnpj))
-        conexao_db.commit()
-        cursor.close()
+            if cnpj:
+                user_type = 'empresa'
+            else:
+                user_type = 'fisica'
 
-        return jsonify({'message': 'Usuário criado com sucesso!'})
+            # Verificar se já exise um usuário com o username citado.
+            cursor.execute('SELECT username FROM usuarios WHERE username = %s', (username,))
+            row = cursor.fetchone()
+        
+
+            if row is not None and row[0] == username:
+                return jsonify({'message': 'Esse nome de usuário já existe! Tente digitar outro.'}), 409 # Http status de conflit
+            else:       
+                # Gerar hash antes de armazenar senha
+                hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+                # Inserir novo usuário dentro do banco
+                cursor.execute('INSERT INTO usuarios (username, password, user_type, cnpj) VALUES (%s, %s, %s, %s)', (username, hashed_password, user_type, cnpj))
+                conexao_db.commit()
+                cursor.close()
+
+                return jsonify({'message': 'Usuário criado com sucesso!'}), 201
+            
+        except Exception as e:
+            return jsonify({'message ': 'Erro interno do servidor', 'error': str(e)}), 500
+        finally:
+            cursor.close()
+            
     
 
     @staticmethod

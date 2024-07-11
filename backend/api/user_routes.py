@@ -28,10 +28,6 @@ def user_routes(app):
         data = request.json
 
         if 'new_username' in data and 'new_password' in data:
-            conexao_db, cursor = conectar_db()
-
-            if conexao_db is None:
-                return jsonify(cursor), 500
             
             # Tratando possivel cnpj q vem na request
             if 'cnpj' in data:
@@ -46,4 +42,4 @@ def user_routes(app):
         
         # Tratando possiveis erros ao criar conta
         else:
-            return jsonify({'message': 'Não foi possivel criar a sua conta. Verifique se preencheu os campo corretamente.'})
+            return jsonify({'message': 'Não foi possivel criar a sua conta. Verifique se preencheu os campo corretamente.'}), 400

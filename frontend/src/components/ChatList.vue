@@ -51,7 +51,7 @@ export default {
     const username = sessionStorage.getItem('username');
     const chats = ref([]);
     const selectedChat = ref(null)
-    const newChatId = computed(() => store.getters['chat/getNewChatId']);
+    const newChatId = computed(() => store.getters['socket/getNewChatId']);
 
     // Configuração do header com os filtros
     const currentFilterLabel = ref('Chats de venda');
@@ -67,7 +67,7 @@ export default {
 
     const handleSearchChats = async (username, situation) => {
       try {
-        const fetchedChats = await store.dispatch('chat/searchUserChats', { username, situation });
+        const fetchedChats = await store.dispatch('socket/searchUserChats', { username, situation });
         chats.value = fetchedChats;
       } catch (err) {
         console.error('Erro ao buscar conversas:', err);
@@ -89,10 +89,10 @@ export default {
         const chat = chats.value.find(chat => chat.id_chat == newVal);
         if (chat) {
           await openChat(chat);
-          store.commit('chat/setNewChatId', null)
+          store.commit('socket/setNewChatId', null)
         } else {
           // Se o chat ainda não estiver na lista, buscar do servidor (opcional)
-          const fetchedChat = store.dispatch('chat/fetchChatById', newVal);
+          const fetchedChat = store.dispatch('socket/fetchChatById', newVal);
           if (fetchedChat) {
             chats.value.push(fetchedChat);
             openChat(fetchedChat);
@@ -110,7 +110,7 @@ export default {
 
     onBeforeUnmount(() => {
       // Remover listener ao desmontar o componente
-      store.dispatch('chat/removeMessagesListener')
+      store.dispatch('socket/removeMessagesListener')
     });
 
     const openChat = async  (chat) => {

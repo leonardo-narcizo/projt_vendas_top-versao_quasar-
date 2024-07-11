@@ -1,5 +1,6 @@
 import { data } from 'autoprefixer';
 import io from 'socket.io-client'
+import store from '..';
 
 let socket = null
 const baseURL = 'http://localhost:5000'
@@ -193,9 +194,14 @@ export async function criarNovoChat({ commit }, { proprietarioUsername, comprado
 }
 
 
-export async function listenSoldCar() {
+export async function listenSoldCar({ dispatch }) {
   socket.on('new_sold_car', (new_sold_car) => {
     console.log(new_sold_car.carro_vendido)
+
+    // Caso capture o evento de novo carro comprado, ja automaticamente tenta executar a busca dos carros vendidos novamente
+    dispatch('car/searchLastestSoldCars', null, { root: true })
+    console.log('chamou')
+    
   })
 }
 
