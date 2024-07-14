@@ -1,5 +1,5 @@
 from flask_socketio import SocketIO, emit, send, join_room, leave_room
-from db.db_config import conectar_db
+from config.db_config import conectar_db
 from services.users import Usuario
 from services.chat_service import ChatService
 

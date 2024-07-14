@@ -1,10 +1,10 @@
 <template>
   <div>
-    <h4 class="homeTitle text-center q-mb-lg q-py-md bg-secondary">Confira as Últimas notícias</h4>
+    <h4 class="homeTitle text-center q-mb-lg q-py-md bg-secondary"><strong>Confira as Últimas Notícias</strong></h4>
 
     <!-- Últimos Carros Vendidos -->
     <div class="section">
-      <h5>Últimos Carros Vendidos</h5>
+      <h5><strong>Últimos Carros Vendidos</strong></h5>
       <div class="car-list">
         <q-spinner v-if="!lastestSoldCars || !lastestSoldCars.first" color="secondary" size="100px" class="text-center" />
         <!-- Carro Vendido 1 -->

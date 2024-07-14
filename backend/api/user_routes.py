@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from services.users import Usuario, SECRET_KEY
-from db.db_config import conectar_db
+from config.db_config import conectar_db
 
 
 def user_routes(app):

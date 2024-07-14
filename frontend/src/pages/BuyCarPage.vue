@@ -99,6 +99,9 @@
     <!-- Conteúdo principal da página -->
     <q-card class="main-content q-mt-xl">
       <show-cars-component-vue  class="content" v-if="showCars" />
+      <div v-else class="text-center">
+        <q-spinner color="secondary" size="100px" />
+      </div>
     </q-card>
 
     <status-on-footer
@@ -367,5 +370,8 @@ export default {
 }
 .main-content {
   background-color: transparent;
+}
+.enterListener {
+  display: none;
 }
 </style>

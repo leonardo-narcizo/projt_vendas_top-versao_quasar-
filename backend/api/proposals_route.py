@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 from services.users import Usuario, SECRET_KEY
 from services.proposals import Proposta
-from db.db_config import conectar_db
+from config.db_config import conectar_db
 
 def proposals_route(app):
 

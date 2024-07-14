@@ -1,4 +1,4 @@
-from db.db_config import conectar_db, Error
+from config.db_config import conectar_db, Error
 import bcrypt
 
 ### esse arquivo servirá para debug. Util caso alguma senha do banco esteja em texto cru

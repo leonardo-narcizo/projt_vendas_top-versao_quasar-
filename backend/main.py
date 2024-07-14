@@ -4,7 +4,7 @@ import os
 from flask_socketio import SocketIO, emit
 from datetime import datetime
 from services.users import Usuario
-from db.db_config import conectar_db
+from config.db_config import conectar_db
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'backend/googleCloudCredentials.json'
 
@@ -28,12 +28,12 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 criar_rotas_graficos(app)
 proposals_route(app)
 user_routes(app)
+news_routes(app)
 car_routes(app, socketio)
 
 
 ### Importação rotas socket
 socket_routes(socketio)
-news_routes(socketio)
 
 @socketio.on('connect')
 def handle_connect():

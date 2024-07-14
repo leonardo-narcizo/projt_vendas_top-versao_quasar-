@@ -1,4 +1,4 @@
-from db.db_config import conectar_db
+from config.db_config import conectar_db
 from flask import jsonify
 import jwt
 import bcrypt
@@ -42,13 +42,6 @@ class Usuario:
         else:
             return jsonify({'message': 'Usuário não encotrado!'}), 404
         
-    @staticmethod
-    def verificar_token(token):
-        try:
-            data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-            return data['username']
-        except:
-            return None
         
     @staticmethod   
     def get_user_id(username):

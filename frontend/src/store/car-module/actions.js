@@ -70,8 +70,15 @@ export async function searchByPreco({ commit }, { preco_minimo, preco_maximo }) 
 
 
 export async function searchLastestSoldCars( { commit } ) {
+    const token = sessionStorage.getItem('token')
+
     try {
-        const response = await fetch('http://localhost:5000/lastestSoldCars')
+        const response = await fetch('http://localhost:5000/lastestSoldCars', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
         
         const data = await response.json()
 

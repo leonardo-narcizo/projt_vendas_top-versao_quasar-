@@ -4,7 +4,7 @@
         <q-card-section>
           <div class="header text-h6 text-center q-mb-md q-mx-xl">Fazer Proposta</div>
           <q-list class="desc-list q-mx-xl">
-            <q-item class="text-subtitle2">Descrição do carro:</q-item>
+            <q-item class="text-subtitle1">Descrição do carro:</q-item>
             <q-item><strong>Marca</strong>: {{ carDescription.marca }}</q-item>
             <q-item><strong>Modelo</strong>: {{ carDescription.modelo }}</q-item>
             <q-item><strong>Ano</strong>: {{ carDescription.ano }}</q-item>

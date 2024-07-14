@@ -24,7 +24,7 @@
       bordered
       class="q-table-fixed"
     >
-      <template v-slot:body-cell="props">
+      <template v-slot:body-cell="props" v-if="proposalsList">
         <q-td :props="props" :key="props.key">
           <template v-if="props.col.name === 'comprador_username'">
             {{ props.row.comprador_username }}
@@ -46,9 +46,12 @@
 
       <!-- Slot para mensagem personalizada quando não há dados -->
       <template v-slot:no-data>
-        <div class="q-table__simple text-center" style="padding: 20px;">
+        <div class="q-table__simple text-center" style="padding: 20px;" v-if="handleSearchProposals">
           <q-icon name="warning" size="50px" color="warning" />
           <div class="warning-label text-subtitle2">{{ proposalsSearchResult }}</div>
+        </div>
+        <div v-else class="spinner text-center">
+          <q-spinner color="secondary" size="80px" />
         </div>
       </template>
     </q-table>
@@ -313,5 +316,8 @@ export default {
 .warning-label {
   display: inline;
   margin-left: 10px;
+}
+.spinner {
+  margin-left: 45%;
 }
 </style>

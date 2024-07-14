@@ -1,4 +1,4 @@
-from db.db_config import conectar_db
+from config.db_config import conectar_db
 from services.users import Usuario
 from flask import jsonify
 import datetime

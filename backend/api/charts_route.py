@@ -2,47 +2,16 @@ import matplotlib
 matplotlib.use('Agg')  # Configuração do matplotlib para uso em ambientes sem display
 from flask import Flask, jsonify, request, send_file
 from services.users import Usuario, SECRET_KEY
-from db.db_config import conectar_db
+from config.db_config import conectar_db
 from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import io
 from functools import wraps
 import jwt
+from config.auth import token_required
 
 
-# Decorador para exigir token
-def token_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = request.headers.get('Authorization')
-
-        if not token:
-            return jsonify({'message': 'Token é necessário!'}), 403
-
-        try:
-            data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-            current_user = data['username']
-
-            conexao_db, cursor = conectar_db()
-
-            if conexao_db is None:
-                return jsonify({'error': 'Erro de conexão com o banco de dados.'}), 500
-            
-            cursor.execute('SELECT user_type FROM usuarios WHERE username = %s', (current_user,))
-            user_type = cursor.fetchone()[0]
-
-            if user_type != 'empresa':
-                return jsonify({'message': 'Você não possui permissões para acessar insights!'}), 403
-
-        except jwt.ExpiredSignatureError:
-            return jsonify({'message': 'Token expirado!'}), 403
-        except jwt.InvalidTokenError:
-            return jsonify({'message': 'Token inválido!'}), 403
-
-        return f(current_user, *args, **kwargs)
-
-    return decorated
 
 def criar_rotas_graficos(app):
 

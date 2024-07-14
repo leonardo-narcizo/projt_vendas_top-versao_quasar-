@@ -39,6 +39,7 @@
         <div class="send-message-box">
           <q-input
             v-model="newMessage"
+            @keydown.enter="sendMessage"
             filled
             dense
             placeholder="Digite sua mensagem..."

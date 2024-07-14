@@ -1,4 +1,4 @@
-from db.db_config import conectar_db
+from config.db_config import conectar_db
 from services.users import Usuario
 from flask import jsonify
 import datetime
@@ -49,4 +49,43 @@ class CarsService:
             
         except Exception as e:
             return jsonify({'message': 'Erro interno do servidor', 'error': str(e)}), 500
+        
+
+    def get_cars_by_filter(query, params=None):
+        conexao_db, cursor = conectar_db()
+        if conexao_db is None:
+            return None, 'Erro de conexão com o banco de dados'
+        
+        try:
+            if params is None:
+                cursor.execute(query)
+            else:
+                cursor.execute(query, params)
+            rows = cursor.fetchall()
+            conexao_db.close()
+
+            cars = [{
+                'id': row[0],
+                'marca': row[1],
+                'modelo': row[2],
+                'ano': row[3],
+                'quilometragem': row[4],
+                'preco': row[5],
+                'proprietario': row[10],
+                'car_image': row[9]
+            } for row in rows]
+
+            if not cars:
+                return [], False
+            else:
+                return cars, True
+        
+        except Exception as e:
+            return None, str(e)
+        
+        finally:
+            if conexao_db:
+                conexao_db.close()
+
+
 

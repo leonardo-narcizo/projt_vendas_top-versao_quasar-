@@ -1,4 +1,4 @@
-from db.db_config import conectar_db
+from config.db_config import conectar_db
 from .date_service import formatar_data_brasileira
 from .users import Usuario
 from flask import jsonify
