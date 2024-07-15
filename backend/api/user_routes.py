@@ -1,6 +1,8 @@
 from flask import Flask, jsonify, request
 from services.users import Usuario, SECRET_KEY
 from config.db_config import conectar_db
+import os
+url_base = os.getenv('URL_BASE')
 
 
 def user_routes(app):

@@ -4,7 +4,11 @@ import os
 from flask_socketio import SocketIO, emit
 from datetime import datetime
 from services.users import Usuario
+from dotenv import load_dotenv
 from config.db_config import conectar_db
+
+### Carregando as variáveis de ambiente
+load_dotenv()
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'backend/googleCloudCredentials.json'
 
@@ -15,10 +19,13 @@ from api.car_routes import *
 from api.socket_routes import *
 from api.news_routes import *
 
+
 #### API config
 app = Flask(__name__)
 CORS(app)
 app.json.sort_keys = False
+
+
 
 ### Config do socketIO
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -45,5 +52,7 @@ def handle_disconnect():
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    host = os.getenv('FLASK_RUN_HOST')
+    port = os.getenv('FLASK_RUN_PORT')
+    socketio.run(app, host=host, port=port, debug=True)
 
