@@ -4,7 +4,7 @@
   "description": "Um ecossistema de transações, entre empresas de automóveis",
   "productName": "Vendas Top",
   "author": "Leonardo Narcizo <leonardonarcizo44@gmail.com>",
-  "private": true,
+  "private": false,
   "scripts": {
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0",
