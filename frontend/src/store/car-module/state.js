@@ -21,7 +21,10 @@ export default function () {
         first: null,
         second: null,
         third: null
-      }
+      },
+      disponibleBrands: [],
+      disponibleModels: [],
+      disponibleYears: []
     }
   }
   

@@ -3,4 +3,4 @@ db/__pycache__/
 services/__pycache__/
 api/__pycache__/
 
-googleCloudCredentials.json
+backend/googleCloudCredentials.json

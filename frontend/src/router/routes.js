@@ -5,6 +5,7 @@ import HomePage from 'src/pages/HomePage.vue'
 import PostCarPage from 'src/pages/PostCarPage.vue'
 import BuyCarPage from 'src/pages/BuyCarPage.vue'
 import ProposalsPage from 'src/pages/ProposalsPage.vue'
+import HistoryPage from 'src/pages/HistoryPage.vue'
 import Insights from 'src/pages/Insights.vue'
 import ErrorNotFound from 'src/pages/ErrorNotFound.vue'
 
@@ -61,6 +62,15 @@ const routes = [
     props: { namePage: 'Insights' },
     children: [
       { path: '', component: Insights }
+    ]
+  },
+  {
+    path: '/history',
+    meta: { requiresAuth: true },
+    component: () => import('layouts/HomeLayout.vue'),
+    props: { namePage: 'Histórico de Transações' },
+    children: [
+      { path: '', component: HistoryPage }
     ]
   },
   {

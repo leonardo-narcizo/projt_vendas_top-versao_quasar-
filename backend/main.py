@@ -18,6 +18,7 @@ from api.user_routes import *
 from api.car_routes import *
 from api.socket_routes import *
 from api.news_routes import *
+from api.fipe_table_routes import *
 
 
 #### API config
@@ -37,6 +38,7 @@ proposals_route(app)
 user_routes(app)
 news_routes(app)
 car_routes(app, socketio)
+fipe_table_routes(app)
 
 
 ### Importação rotas socket

@@ -77,6 +77,7 @@ export default {
     const items = [
       { title: 'Home', to: '/home', icon: 'home' },
       { title: 'Colocar um carro à venda', to: '/postCar', icon: 'add_circle'},
+      { title: 'Histórico de Transações', to: '/history', icon: 'work_history' },
       { title: 'Propostas de compra', to: '/proposals', icon: 'mail' },
       { title: 'Comprar carro', to: '/buyCar', icon: 'shopping_cart'},
       { title: 'Meus insights', to: '/insights', icon: 'bar_chart'}

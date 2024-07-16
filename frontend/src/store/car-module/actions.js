@@ -93,3 +93,47 @@ export async function searchLastestSoldCars( { commit } ) {
         console.error('[erro]: ', err)
     }
 }
+
+
+export async function searchDisponibleBrands( { commit } ) {
+    try {
+        const response = await fetch('http://localhost:5000/searchFipeBrands')
+
+        const data = await response.json()
+
+        if (response.ok) {
+            commit('setDisponibleBrands', data.brands_list)
+        }
+        else {
+            console.error('erro ao buscar marcas: ', data.message)
+        }
+    }
+    catch (err) {
+        console.error('erro ao buscar marcas; ', err)
+    }
+}
+
+
+export async function searchDisponibleModels( { commit }, brand_id ) {
+    try {
+        const response = await fetch(`http://localhost:5000/searchFipeModels/${brand_id}`)
+
+        const data = await response.json()
+
+        if (response.ok) {
+            commit('setDisponibleModels', data.models_list)
+        }
+        else {
+            console.error('erro ao buscar modelos: ', data.message)
+        }
+    }
+    catch (err) {
+        console.error('erro ao buscar modelos; ', err)
+    }
+}
+
+
+/* Amanhã por ultimo, configurar a rota de buscar as opcoes de ano de acordo com o modelo q é selecionado la no input,
+e depois disso fazer a logica do envio da marca, modelo e ano, para a rota q buscará o preço médio para a descrição dada,
+sobre um carro específico: primeiro iremos validar se todos inputs(c excessao do 'preco'), estão preenchidos
+*/

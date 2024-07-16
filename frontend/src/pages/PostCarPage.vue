@@ -7,12 +7,20 @@
       </q-card-section>
       <q-card-section>
         <q-form @submit.prevent="handleSubmit" class="form" enctype="multipart/form-data">
-          <q-input v-model="marca" label="Digite o fabricante" type="text" standard />
-          <q-input v-model="modelo" label="Digite o modelo" type="text" standard />
+          <q-select
+            v-model="marca"
+            :options="brands_options"
+            label="Escolha o fabricante"
+            popup-content-class="custom-select-popup"
+             />
+          <q-select v-model="modelo" :options="models_options" label="Escolha o modelo" :disable="!isModelSelectEnabled" />
           <q-input v-model="ano" label="Digite o ano de fabricação" type="number" standard />
           <q-input v-model="quilometragem" label="Digite a quilometragem" type="number" standard />
-          <q-input v-model="preco" label="Digite o preço" type="number" standard />
           <q-file v-model="file" label="Anexar imagem do carro" accept=".jpg,.png,.jpeg" @change="handleFileChange" />
+          <div class="text-center">
+            <q-btn @click="search_medium_price" label="Buscar preço sugerido pela tabela Fipe" color="primary" class="q-mt-md" />
+          </div>
+          <q-input v-model="preco" label="Digite o preço inicial" type="number" standard />
           <q-btn type="submit" label="Colocar carro à venda" color="secondary" class="btn q-py-sm" />
         </q-form>
       </q-card-section>
@@ -29,7 +37,7 @@
 
 <script>
 import StatusOnFooter from 'src/components/StatusOnFooter.vue';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 
 export default {
@@ -37,15 +45,6 @@ export default {
     StatusOnFooter,
   },
   setup() {
-    const updateShowFooter = (value) => {
-      showFooter.value = value;
-    };
-
-    const store = useStore();
-    const showFooter = ref(false);
-    const footerStatus = ref('');
-    const footerMessage = ref('');
-
     const username = sessionStorage.getItem('username');
     const marca = ref('');
     const modelo = ref('');
@@ -56,6 +55,54 @@ export default {
 
     const isPosted = computed(() => store.getters['car/getIsPosted']);
     const postResult = computed(() => store.getters['car/getPostResult']);
+    const isModelSelectEnabled = ref(false)
+
+    onMounted(async() => {
+      await store.dispatch('car/searchDisponibleBrands')
+    })
+    onBeforeUnmount(() => {
+      isModelSelectEnabled
+      store.commit('car/setDisponibleBrands', [])
+    })
+    
+    const updateShowFooter = (value) => {
+      showFooter.value = value;
+    };
+
+    const store = useStore();
+    const showFooter = ref(false);
+    const footerStatus = ref('');
+    const footerMessage = ref('');
+
+    const brands_list = computed(() => store.getters['car/getDisponibleBrands'])
+    const brands_options = computed(() => brands_list.value.map(brand => brand.brand_name))
+
+    // Por meio de uma propriedade computada, conseguimos pegar o id da marca atual q foi selecionada pelo select, e mandamos como parametro p API
+    const brand_id = computed(() => {
+      const selectedBrand = brands_list.value.find(brand => brand.brand_name === marca.value);
+      return selectedBrand ? selectedBrand.brand_id : null;
+    });
+    
+
+    const models_list = computed(() => store.getters['car/getDisponibleModels'])
+    const models_options = computed(() => models_list.value.map(model => model.model_name))
+
+    watch(brand_id, async (newVal) => {
+      if (newVal) {
+        console.log('mudou a marca: ', newVal)
+        await store.dispatch('car/searchDisponibleModels', newVal)
+        isModelSelectEnabled.value = true;
+      }
+      else {
+        isModelSelectEnabled.value = false
+      }
+    })
+    
+
+    const search_medium_price = () => console.log('chegou brands: ', brands_options)
+
+
+
 
     const handleFileChange = (files) => {
       file.value = files[0];
@@ -109,7 +156,11 @@ export default {
       isPosted,
       postResult,
       updateShowFooter,
-      handleFileChange
+      handleFileChange,
+      brands_options,
+      models_options,
+      search_medium_price,
+      isModelSelectEnabled
     };
   }
 };
@@ -131,4 +182,10 @@ export default {
   margin: auto;
   margin-top: 15px;
 }
+
+.custom-select-popup {
+  max-height: 50px; /* Defina a altura máxima desejada */
+  overflow-y: auto; /* Habilita a rolagem vertical */
+}
+
 </style>
