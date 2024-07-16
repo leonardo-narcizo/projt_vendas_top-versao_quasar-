@@ -10,7 +10,7 @@ from config.db_config import conectar_db
 ### Carregando as variáveis de ambiente
 load_dotenv()
 
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'backend/googleCloudCredentials.json'
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'backend/googleCloudCredentials2.json'
 
 from api.charts_route import *
 from api.proposals_route import *
